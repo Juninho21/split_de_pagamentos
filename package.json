@@ -1,0 +1,19 @@
+{
+    "name": "sistema-split-pix-mp",
+    "version": "1.0.0",
+    "description": "Sistema de split de pagamentos via Pix usando Mercado Pago",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "express": "^4.22.1",
+        "mercadopago": "^2.11.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    }
+}
