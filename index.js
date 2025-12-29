@@ -8,6 +8,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static('public')); // Servir arquivos do Dashboard
 
 // Configuração do Marketplace (Sua aplicação)
 // OBS: Para chamadas de OAuth, usamos as credenciais do Marketplace.
@@ -81,6 +82,18 @@ app.get('/callback', async (req, res) => {
 });
 
 /**
+ * Rota 4: Listar Vendedores (Para o Dashboard)
+ */
+app.get('/api/sellers', (req, res) => {
+    // Retorna apenas dados seguros (ID e mascarados)
+    const safeSellers = Object.keys(sellersDb).map(id => ({
+        id,
+        connected_at: new Date().toISOString() // Simulação
+    }));
+    res.json(safeSellers);
+});
+
+/**
  * Rota 3: Criar Pagamento com Split (Pix Automático)
  * O cliente paga R$ 100,00. 
  * O Marketplace fica com R$ 10,00 (application_fee).
@@ -108,9 +121,16 @@ app.post('/pay/split', async (req, res) => {
 
         const payment = new Payment(sellerClient);
 
+        const amountValue = parseFloat(amount);
+        const feePercentage = parseFloat(fee);
+
+        // Calcula o valor da comissão com base na porcentagem
+        // Ex: R$ 100 * 10% = R$ 10.00
+        const applicationFeeValue = (amountValue * feePercentage) / 100;
+
         const body = {
-            transaction_amount: parseFloat(amount),
-            description: 'Venda Marketplace com Split',
+            transaction_amount: amountValue,
+            description: 'Venda Marketplace com Split (%)',
             payment_method_id: 'pix',
             payer: {
                 email: payerEmail,
@@ -122,7 +142,7 @@ app.post('/pay/split', async (req, res) => {
             },
             // O campo mágico para o Split: application_fee
             // Define quanto o Marketplace (dono do Client ID original) vai reter.
-            application_fee: parseFloat(fee)
+            application_fee: parseFloat(applicationFeeValue.toFixed(2))
         };
 
         const result = await payment.create({ body });
