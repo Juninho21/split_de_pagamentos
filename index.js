@@ -73,11 +73,35 @@ app.get('/callback', async (req, res) => {
         };
 
         console.log(`Vendedor ${sellerId} autenticado com sucesso!`);
-        res.send(`Vendedor conectado! ID: ${sellerId}. Agora você pode processar pagamentos.`);
+
+        // Retorna script para fechar popup ou redirecionar
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <body>
+                <p>Conectado com sucesso! Redirecionando...</p>
+                <script>
+                    // Se estiver em um popup, notifica a janela pai e fecha
+                    if (window.opener) {
+                        window.opener.postMessage('seller_connected', '*');
+                        window.close();
+                    } else {
+                        // Se não for popup, volta para a home (Dashboard)
+                        window.location.href = '/?status=success_connected';
+                    }
+                </script>
+            </body>
+            </html>
+        `;
+        res.send(html);
 
     } catch (error) {
         console.error('Erro no OAuth:', error);
-        res.status(500).json({ error: 'Erro ao conectar conta', details: error.message });
+        res.status(500).send(`
+            <h1>Erro ao conectar</h1>
+            <p>${error.message}</p>
+            <a href="/">Voltar para Home</a>
+        `);
     }
 });
 

@@ -5,6 +5,24 @@ let sellers = [];
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     fetchSellers();
+
+    // Check URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('status') === 'success_connected') {
+        showToast('Vendedor conectado com sucesso!');
+        window.history.replaceState({}, document.title, "/");
+    }
+
+    // Garante que sempre comece na Visão Geral
+    navigateTo('dashboard');
+});
+
+// Listener para fechar popup e recarregar
+window.addEventListener('message', (event) => {
+    if (event.data === 'seller_connected') {
+        showToast('Vendedor conectado via Popup!');
+        fetchSellers(); // Atualiza a lista
+    }
 });
 
 function setupNavigation() {
