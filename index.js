@@ -78,15 +78,15 @@ app.get('/callback', async (req, res) => {
         const html = `
             <!DOCTYPE html>
             <html>
-            <body>
-                <p>Conectado com sucesso! Redirecionando...</p>
+            <body style="background:transparent; display:none;">
                 <script>
-                    // Se estiver em um popup, notifica a janela pai e fecha
                     if (window.opener) {
-                        window.opener.postMessage('seller_connected', '*');
+                        try {
+                            window.opener.postMessage('seller_connected', '*');
+                            window.opener.focus(); // Tenta trazer o dashboard para frente
+                        } catch(e) {}
                         window.close();
                     } else {
-                        // Se não for popup, volta para a home (Dashboard)
                         window.location.href = '/?status=success_connected';
                     }
                 </script>
