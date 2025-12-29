@@ -2,13 +2,14 @@ const express = require('express');
 const { MercadoPagoConfig, Payment, OAuth } = require('mercadopago');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public')); // Servir arquivos do Dashboard
+app.use(express.static(path.join(__dirname, 'public'))); // Servir arquivos do Dashboard com caminho absoluto
 
 // Configuração do Marketplace (Sua aplicação)
 // OBS: Para chamadas de OAuth, usamos as credenciais do Marketplace.
