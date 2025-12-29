@@ -255,8 +255,75 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
+// --- Rotas de Usuários (Admin) ---
+
+/**
+ * Rota: Listar Usuários cadastrados no Firebase Auth
+ */
+app.get('/api/users', async (req, res) => {
+    try {
+        const listUsersResult = await admin.auth().listUsers(100);
+        const users = listUsersResult.users.map(userRecord => ({
+            uid: userRecord.uid,
+            email: userRecord.email,
+            displayName: userRecord.displayName,
+            metadata: userRecord.metadata
+        }));
+        res.json(users);
+    } catch (error) {
+        console.error('Erro ao listar usuários:', error);
+        res.status(500).json({ error: 'Erro ao buscar usuários' });
+    }
+});
+
+/**
+ * Rota: Criar novo usuário (Admin)
+ */
+app.post('/api/users', async (req, res) => {
+    const { email, password, displayName } = req.body;
+
+    if (!email || !password || password.length < 6) {
+        return res.status(400).json({ error: 'Dados inválidos. Senha deve ter pelo menos 6 caracteres.' });
+    }
+
+    try {
+        const userRecord = await admin.auth().createUser({
+            email,
+            emailVerified: false,
+            password,
+            displayName,
+            disabled: false
+        });
+
+        res.status(201).json({
+            message: 'Usuário criado com sucesso!',
+            uid: userRecord.uid
+        });
+    } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * Rota: Deletar usuário (Admin)
+ */
+app.delete('/api/users/:uid', async (req, res) => {
+    const { uid } = req.params;
+
+    try {
+        await admin.auth().deleteUser(uid);
+        res.json({ message: 'Usuário deletado com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao deletar usuário:', error);
+        res.status(500).json({ error: 'Erro ao deletar usuário.' });
+    }
+});
+
+// Para Vercel (Serverless)
 module.exports = app;
 
+// Só roda o listen se NÃO estivermos na Vercel ou se formos o script principal
 if (require.main === module) {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {

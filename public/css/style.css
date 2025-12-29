@@ -1,5 +1,6 @@
 :root {
-    --primary: #009EE3; /* Mercado Pago Blue */
+    --primary: #009EE3;
+    /* Mercado Pago Blue */
     --primary-hover: #007eb5;
     --secondary: #2C3E50;
     --background: #F5F7FA;
@@ -9,7 +10,7 @@
     --border: #E0E0E0;
     --success: #27AE60;
     --radius: 8px;
-    --shadow: 0 4px 6px rgba(0,0,0,0.05);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -68,9 +69,24 @@ body {
     font-weight: 500;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover,
+.nav-link.active {
     background-color: rgba(0, 158, 227, 0.1);
     color: var(--primary);
+}
+
+.nav-footer {
+    margin-top: auto;
+}
+
+.nav-link.logout {
+    color: #ef4444;
+    /* Red color */
+}
+
+.nav-link.logout:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
 }
 
 /* Main Content */
@@ -241,7 +257,8 @@ h2 {
     border-collapse: collapse;
 }
 
-.data-table th, .data-table td {
+.data-table th,
+.data-table td {
     padding: 16px 24px;
     text-align: left;
     border-bottom: 1px solid var(--border);
@@ -258,7 +275,9 @@ h2 {
     font-size: 0.95rem;
 }
 
-.text-center { text-align: center; }
+.text-center {
+    text-align: center;
+}
 
 /* Forms */
 .card {
@@ -285,7 +304,8 @@ h2 {
     color: var(--secondary);
 }
 
-.form-group input, .form-group select {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--border);
@@ -295,7 +315,8 @@ h2 {
     transition: border-color 0.2s;
 }
 
-.form-group input:focus, .form-group select:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--primary);
 }
@@ -310,7 +331,9 @@ h2 {
 }
 
 /* Result Area */
-.hidden { display: none !important; }
+.hidden {
+    display: none !important;
+}
 
 .result-container {
     display: flex;
@@ -322,8 +345,15 @@ h2 {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .success-header .icon-check {
@@ -382,7 +412,7 @@ h2 {
     color: white;
     padding: 16px 24px;
     border-radius: var(--radius);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     transition: opacity 0.3s, transform 0.3s;
 }

@@ -36,6 +36,22 @@ function setupNavigation() {
             navigateTo(targetId);
         });
     });
+
+    // Logout
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await firebase.auth().signOut();
+                // Redirect is handled by onAuthStateChanged in index.html
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Erro ao sair:', error);
+                showToast('Erro ao tentar sair.');
+            }
+        });
+    }
 }
 
 function navigateTo(sectionId) {
@@ -51,12 +67,29 @@ function navigateTo(sectionId) {
     const titles = {
         'dashboard': 'Visão Geral',
         'sellers': 'Gerenciar Vendedores',
-        'payments': 'Novo Split'
+        'payments': 'Novo Split',
+        'users': 'Gerenciar Usuários'
     };
     document.getElementById('page-title').textContent = titles[sectionId];
+
+    // Carregar dados específicos da seção
+    if (sectionId === 'users') {
+        fetchUsers();
+    }
 }
 
 // API Calls
+async function fetchUsers() {
+    try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+        updateUsersTable(data);
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        showToast('Erro ao carregar usuários.');
+    }
+}
+
 async function fetchSellers() {
     try {
         const response = await fetch('/api/sellers');
@@ -93,6 +126,97 @@ async function connectSeller() {
     } catch (error) {
         console.error('Erro ao gerar URL:', error);
         showToast('Erro ao iniciar conexão.');
+    }
+}
+
+// User Management
+const createUserForm = document.getElementById('create-user-form');
+if (createUserForm) {
+    createUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const originalText = btn.textContent;
+
+        btn.textContent = 'Cadastrando...';
+        btn.disabled = true;
+
+        const displayName = document.getElementById('new-user-name').value;
+        const email = document.getElementById('new-user-email').value;
+        const password = document.getElementById('new-user-password').value;
+
+        try {
+            const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ displayName, email, password })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showToast('Usuário cadastrado com sucesso!');
+                e.target.reset();
+                fetchUsers();
+            } else {
+                showToast(result.error || 'Erro ao criar usuário');
+            }
+        } catch (error) {
+            console.error(error);
+            showToast('Erro de conexão ao criar usuário.');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    });
+}
+
+// UI Updates
+function updateUsersTable(data) {
+    const tbody = document.getElementById('users-list');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center">Nenhum usuário encontrado.</td></tr>';
+        return;
+    }
+
+    data.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div style="display: flex; flex-direction: column;">
+                    <strong style="color: var(--text-heading);">${user.displayName || 'Sem nome'}</strong>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Criado em: ${new Date(user.metadata.creationTime).toLocaleDateString()}</span>
+                </div>
+            </td>
+            <td>${user.email}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.uid}')" style="background-color: #fee2e2; color: #dc2626; border: none;">
+                    Excluir
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+async function deleteUser(uid) {
+    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+    try {
+        const response = await fetch(`/api/users/${uid}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            showToast('Usuário excluído.');
+            fetchUsers();
+        } else {
+            showToast('Erro ao excluir usuário.');
+        }
+    } catch (error) {
+        console.error(error);
+        showToast('Erro de conexão.');
     }
 }
 
