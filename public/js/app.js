@@ -5,6 +5,8 @@ let sellers = [];
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     fetchSellers();
+    fetchStats();
+    setInterval(fetchStats, 10000); // Atualiza stats a cada 10s
 
     // Check URL params
     const urlParams = new URLSearchParams(window.location.search);
@@ -224,4 +226,25 @@ function showToast(msg) {
     setTimeout(() => {
         toast.classList.add('hidden');
     }, 3000);
+}
+
+// Stats
+async function fetchStats() {
+    try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+
+        // Update stats
+        if (document.getElementById('total-sellers'))
+            document.getElementById('total-sellers').textContent = data.total_sellers;
+
+        if (document.getElementById('total-amount'))
+            document.getElementById('total-amount').textContent = (data.total_amount || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        if (document.getElementById('total-fees'))
+            document.getElementById('total-fees').textContent = (data.total_fees || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+    }
 }

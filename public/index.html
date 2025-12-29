@@ -14,6 +14,20 @@
 </head>
 
 <body>
+    <!-- Firebase Auth Check (Protect Route) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = '/login.html';
+            } else {
+                // Opcional: Mostrar email do usuario na interface
+                // document.querySelector('.username').textContent = user.email.split('@')[0];
+            }
+        });
+    </script>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -81,11 +95,11 @@
                         </div>
                         <div class="stat-card">
                             <span class="stat-label">Pagamentos Hoje</span>
-                            <div class="stat-value">R$ 0,00</div>
+                            <div class="stat-value" id="total-amount">R$ 0,00</div>
                         </div>
                         <div class="stat-card">
                             <span class="stat-label">Comissões (Fees)</span>
-                            <div class="stat-value highlight">R$ 0,00</div>
+                            <div class="stat-value highlight" id="total-fees">R$ 0,00</div>
                         </div>
                     </div>
 
