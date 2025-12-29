@@ -31,7 +31,8 @@ const sellersDb = {};
 app.get('/auth/url', (req, res) => {
     // Parâmetros para a URL de autorização
     // redirect_uri deve ser idêntica à cadastrada no painel do MP
-    const authUrl = `https://auth.mercadopago.com.br/authorization?client_id=${process.env.MP_APP_ID}&response_type=code&platform_id=mp&redirect_uri=${process.env.REDIRECT_URI}`;
+    const redirectUri = encodeURIComponent(process.env.REDIRECT_URI);
+    const authUrl = `https://auth.mercadopago.com.br/authorization?client_id=${process.env.MP_APP_ID}&response_type=code&platform_id=mp&redirect_uri=${redirectUri}`;
 
     res.json({ url: authUrl });
 });
